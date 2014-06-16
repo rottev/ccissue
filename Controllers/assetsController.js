@@ -8,7 +8,6 @@ module.exports = (function () {
             if (!req.hasOwnProperty("body")) {
                 res.json(404, { error: 'no asset parameter found in body' });
                 console.log(res.statusCode + " " + JSON.stringify({ error: 'no asset parameter found in body' }));
-                console.log(req.body);
                 return;
             }
             assetModel.generate(req.body, function (err, data) {

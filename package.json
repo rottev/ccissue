@@ -3,6 +3,7 @@
   {
     "express":"*",
     "body-parser":"*",
-    "jsonschema":"*"
+    "jsonschema":"*",
+    "moment":"*"
   }
 }

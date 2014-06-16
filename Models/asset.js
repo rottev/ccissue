@@ -25,8 +25,13 @@ module.exports = (function () {
 
     function asset() { }
     asset.generate = function generate(assetin, next) {
-        console.log(assetin);
-        console.log(v.validate(assetin, assetSchema));
+
+        var result = v.validate(assetin, assetSchema);
+        if (result.errors.length > 0) {
+            next({ error: result.errors[0] }, null);
+            return;
+        }
+
 
         client.hexists('asset', assetin.id, function (err, data) {
             if (data === 1) {
@@ -40,7 +45,7 @@ module.exports = (function () {
                 next(err, { key: key });
             });
 
-            client.hmset('asset-key', assetin.id, key, function (err, data) {  });
+            client.hmset('asset-key', assetin.id, key, function (err, data) { });
 
         });
     }

@@ -2,6 +2,7 @@ var express = require('express');
 var redis = require('redis');
 var bodyParser = require('body-parser')
 var assetsController = require('./Controllers/assetsController');
+var issueController = require('./Controllers/issueController');
 
 var app = express();
 
@@ -13,5 +14,6 @@ app.get('/', function(req, res){
 });
 
 assetsController.registerEndpoints(app);
+issueController.registerEndpoints(app);
 
 app.listen(8080);
