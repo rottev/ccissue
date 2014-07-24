@@ -29,7 +29,7 @@ module.exports = (function () {
 
     function issueance() { }
 
-    issueance.generate = function generate(key, issuanceObj, next) {
+    issueance.generate = function generate(key, issuanceObj, istestnet, next) {
 
         var result = v.validate(issuanceObj, issueSchema);
         if (result.errors.length > 0) {
@@ -41,39 +41,44 @@ module.exports = (function () {
         issuanceObj.date = moment().format("YYYY-MM-DD");
 
         console.log(issuanceObj.asssetId);
-        client.hget('asset-key', issuanceObj.asssetId, function (err, data) {
-            if (key === data) {
-                 client.hmset('issued', key, issuanceObj, function (err, data) {
+        client.select(istestnet ? 1 : 0, function () {
+            client.hget('asset-key', issuanceObj.asssetId, function (err, data) {
+                if (key === data) {
+                    client.hmset('issued', key, issuanceObj, function (err, data) {
                         next(err, data);
                     });
-            }
-            else {
-                next(new Error("Asset key doesnt match"));
-                return;
-            }
+                }
+                else {
+                    next(new Error("Asset key doesnt match"));
+                    return;
+                }
+            });
         });
+
     }
 
 
-        issueance.getAll = function getAll(next) {
-        client.hvals('issued', function (err, obj) {
+    issueance.getAll = function getAll(istestnet, next) {
+        client.select(istestnet ? 1 : 0, function () {
+            client.hvals('issued', function (err, obj) {
 
-            try {
-                var array = [];
-                if (!_.isArray(obj)) {
-                    array.push(JSON.parse(obj))
-                }
-                else {
-                    for (var item in obj) {
-                        array.push(JSON.parse(obj[item]));
+                try {
+                    var array = [];
+                    if (!_.isArray(obj)) {
+                        array.push(JSON.parse(obj))
                     }
+                    else {
+                        for (var item in obj) {
+                            array.push(JSON.parse(obj[item]));
+                        }
+                    }
+                    next(err, array);
                 }
-                next(err, array);
-            }
-            catch (ex) {
-                next(ex, null);
-            }
+                catch (ex) {
+                    next(ex, null);
+                }
 
+            });
         });
     }
 
